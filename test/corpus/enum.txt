@@ -1,0 +1,44 @@
+================================================================================
+Enum
+================================================================================
+
+module std
+
+enum Temperature =
+  | celsius(float)
+  | fahrenheit(float)
+
+enum Colors =
+  | rgb(int, int, int)
+  | rgba(int, int, int, int)
+  | hex(int)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (module
+    (identifier))
+  (enum
+    (identifier)
+    (enum_field
+      (identifier)
+      (identifier))
+    (enum_field
+      (identifier)
+      (identifier)))
+  (enum
+    (identifier)
+    (enum_field
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    (enum_field
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    (enum_field
+      (identifier)
+      (identifier))))

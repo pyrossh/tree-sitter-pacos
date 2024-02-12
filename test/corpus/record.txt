@@ -1,0 +1,80 @@
+================================================================================
+Record
+================================================================================
+
+module std
+
+record Cat(name: str, age:  int)
+
+record Dog(
+  name: str,
+  age:  int
+)
+
+record Dog[A, B](
+  name: A,
+  age:  B
+)
+
+record Dog[A: Compare & String, B](
+  name: A,
+  age:  B
+)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (module
+    (identifier))
+  (record
+    (identifier)
+    (record_field
+      (identifier)
+      (type2
+        (identifier)))
+    (record_field
+      (identifier)
+      (type2
+        (identifier))))
+  (record
+    (identifier)
+    (record_field
+      (identifier)
+      (type2
+        (identifier)))
+    (record_field
+      (identifier)
+      (type2
+        (identifier))))
+  (record
+    (identifier)
+    (generic_list
+      (generic_type2
+        (identifier))
+      (generic_type2
+        (identifier)))
+    (record_field
+      (identifier)
+      (type2
+        (identifier)))
+    (record_field
+      (identifier)
+      (type2
+        (identifier))))
+  (record
+    (identifier)
+    (generic_list
+      (generic_type2
+        (identifier)
+        (identifier)
+        (identifier))
+      (generic_type2
+        (identifier)))
+    (record_field
+      (identifier)
+      (type2
+        (identifier)))
+    (record_field
+      (identifier)
+      (type2
+        (identifier)))))

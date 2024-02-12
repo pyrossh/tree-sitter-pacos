@@ -1,0 +1,42 @@
+================================================================================
+Enum
+================================================================================
+
+module std
+
+trait Comparable[A](
+  fn compare(left: A, right: A): bool
+)
+
+trait Stringable(
+  fn to_str(): str
+)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (module
+    (identifier))
+  (trait
+    (identifier)
+    (generic_list
+      (generic_type2
+        (identifier)))
+    (trait_field
+      (identifier)
+      (param
+        (identifier)
+        (type2
+          (identifier)))
+      (param
+        (identifier)
+        (type2
+          (identifier)))
+      (type2
+        (identifier))))
+  (trait
+    (identifier)
+    (trait_field
+      (identifier)
+      (type2
+        (identifier)))))
