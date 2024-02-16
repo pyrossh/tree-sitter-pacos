@@ -1,0 +1,90 @@
+================================================================================
+For
+================================================================================
+
+test("for") |t|
+  for i := range 10
+    pass
+
+  for i := range n
+    pass
+
+  for k, v := range data
+    pass
+
+  for v := range data.list
+    pass
+
+  for v := range [1, 2, 3]
+    pass
+
+  for k, v := range [:a => 1, :b => 2]
+    pass
+
+--------------------------------------------------------------------------------
+
+(source
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
+      (identifier)
+      (body
+        (for_statement
+          (identifier)
+          (range_value
+            (integer))
+          (body
+            (pass_statement)))
+        (for_statement
+          (identifier)
+          (range_value
+            (reference
+              (identifier)))
+          (body
+            (pass_statement)))
+        (for_statement
+          (identifier)
+          (identifier)
+          (range_value
+            (reference
+              (identifier)))
+          (body
+            (pass_statement)))
+        (for_statement
+          (identifier)
+          (range_value
+            (reference
+              (identifier)
+              (identifier)))
+          (body
+            (pass_statement)))
+        (for_statement
+          (identifier)
+          (range_value
+            (list
+              (integer)
+              (integer)
+              (integer)))
+          (body
+            (pass_statement)))
+        (for_statement
+          (identifier)
+          (identifier)
+          (range_value
+            (map
+              (key_value
+                (key
+                  (symbol
+                    (identifier)))
+                (value
+                  (integer)))
+              (key_value
+                (key
+                  (symbol
+                    (identifier)))
+                (value
+                  (integer)))))
+          (body
+            (pass_statement)))))))

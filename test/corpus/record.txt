@@ -2,8 +2,6 @@
 Record
 ================================================================================
 
-module std
-
 record Cat(name: str, age:  int)
 
 record Dog(
@@ -23,9 +21,7 @@ record Dog[A: Compare & String, B](
 
 --------------------------------------------------------------------------------
 
-(source_file
-  (module
-    (identifier))
+(source
   (record
     (identifier)
     (record_field

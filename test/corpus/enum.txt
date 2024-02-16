@@ -2,8 +2,6 @@
 Enum
 ================================================================================
 
-module std
-
 enum Temperature =
   | celsius(float)
   | fahrenheit(float)
@@ -15,9 +13,7 @@ enum Colors =
 
 --------------------------------------------------------------------------------
 
-(source_file
-  (module
-    (identifier))
+(source
   (enum
     (identifier)
     (enum_field

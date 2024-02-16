@@ -2,8 +2,6 @@
 Enum
 ================================================================================
 
-module std
-
 trait Comparable[A](
   fn compare(left: A, right: A): bool
 )
@@ -14,9 +12,7 @@ trait Stringable(
 
 --------------------------------------------------------------------------------
 
-(source_file
-  (module
-    (identifier))
+(source
   (trait
     (identifier)
     (generic_list

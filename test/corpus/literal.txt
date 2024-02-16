@@ -1,0 +1,130 @@
+================================================================================
+Integers
+================================================================================
+
+-1
+0xcafe
+0o123
+0b001
+0i
+
+--------------------------------------------------------------------------------
+
+(source
+  (ERROR
+    (identifier)))
+
+================================================================================
+Unicode escape sequences
+================================================================================
+
+"\x12 \123 \u1234"
+
+--------------------------------------------------------------------------------
+
+(source
+  (ERROR
+    (string_start)
+    (identifier)
+    (UNEXPECTED '1')
+    (UNEXPECTED 'u')
+    (identifier)
+    (string_start)))
+
+================================================================================
+Other primitives
+================================================================================
+
+true
+false
+nil
+
+--------------------------------------------------------------------------------
+
+(source
+  (ERROR
+    (identifier)
+    (false)
+    (nil)))
+
+================================================================================
+Multi-line strings
+================================================================================
+
+"""
+A double quote hello,
+without double or single quotes.
+"""
+
+"""
+A double quote "hello",
+with double quotes.
+"""
+
+"""
+A double quote 'hello',
+with single quotes.
+"""
+
+"""
+A double quote hello\n\
+with an escaped newline\n\
+and another escaped newline\n\
+"""
+
+--------------------------------------------------------------------------------
+
+(source
+  (ERROR
+    (string_start)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (string_start)
+    (string_start)
+    (identifier)
+    (identifier)
+    (identifier)
+    (string_start)
+    (identifier)
+    (string_start)
+    (identifier)
+    (identifier)
+    (identifier)
+    (string_start)
+    (string_start)
+    (identifier)
+    (identifier)
+    (identifier)
+    (string_start)
+    (identifier)
+    (string_start)
+    (identifier)
+    (identifier)
+    (identifier)
+    (string_start)
+    (string_start)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (line_continuation)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (line_continuation)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)
+    (string_start)))

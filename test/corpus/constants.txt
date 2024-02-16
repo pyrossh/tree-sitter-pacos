@@ -1,0 +1,77 @@
+================================================================================
+Constants
+================================================================================
+
+START_YEAR = 2101
+PI = 3.14159
+// NAME = "pacos"
+DEBUG_ENABLED = true
+COUNT = count(10)
+COUNTRIES_LIST = ["US", "INDIA", "CANADA"]
+COUNTRY_CODES = [
+  :in => "INDIA",
+  :us => "United States",
+  :ca => "Canada"
+]
+
+
+--------------------------------------------------------------------------------
+
+(source
+  (const
+    (const_identifier)
+    (const_literal
+      (integer)))
+  (const
+    (const_identifier)
+    (const_literal
+      (float)))
+  (comment)
+  (const
+    (const_identifier)
+    (const_literal
+      (true)))
+  (const
+    (const_identifier)
+    (ERROR
+      (identifier)
+      (identifier))
+    (const_literal
+      (list
+        (string
+          (string_start)
+          (string_end))
+        (string
+          (string_start)
+          (string_end))
+        (string
+          (string_start)
+          (string_end)))))
+  (const
+    (const_identifier)
+    (const_literal
+      (map
+        (key_value
+          (key
+            (symbol
+              (identifier)))
+          (value
+            (string
+              (string_start)
+              (string_end))))
+        (key_value
+          (key
+            (symbol
+              (identifier)))
+          (value
+            (string
+              (string_start)
+              (string_end))))
+        (key_value
+          (key
+            (symbol
+              (identifier)))
+          (value
+            (string
+              (string_start)
+              (string_end))))))))

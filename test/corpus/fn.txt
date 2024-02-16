@@ -1,0 +1,56 @@
+================================================================================
+Function
+================================================================================
+
+fn to_celsius(f: float): float =
+  `converts f in fahrenheit to celsius to a value
+  pass
+
+fn create_post_action(req: Request): Response =
+  pass
+
+#[get("/posts")]
+fn fetch_all_posts(req: Request): Response =
+  pass
+
+--------------------------------------------------------------------------------
+
+(source
+  (fn
+    (identifier)
+    (param
+      (identifier)
+      (type2
+        (identifier)))
+    (type2
+      (identifier))
+    (body
+      (doc_comment)
+      (pass_statement)))
+  (fn
+    (identifier)
+    (param
+      (identifier)
+      (type2
+        (identifier)))
+    (type2
+      (identifier))
+    (body
+      (pass_statement)))
+  (fn
+    (decorator
+      (call
+        (identifier)
+        (argument_list
+          (string
+            (string_start)
+            (string_end)))))
+    (identifier)
+    (param
+      (identifier)
+      (type2
+        (identifier)))
+    (type2
+      (identifier))
+    (body
+      (pass_statement))))

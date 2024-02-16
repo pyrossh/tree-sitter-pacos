@@ -6,7 +6,6 @@ const PREC = {
   conditional: -1,
 
   parenthesized_expression: 1,
-  parenthesized_list_splat: 1,
   or: 10,
   and: 11,
   not: 12,
@@ -35,12 +34,8 @@ module.exports = grammar({
 
   conflicts: ($) => [
     [$.primary_expression, $.pattern],
-    [$.primary_expression, $.list_splat_pattern],
-    [$.tuple, $.tuple_pattern],
     [$.list, $.list_pattern],
-    [$.with_item, $._collection_elements],
     [$.named_expression, $.as_pattern],
-    [$.print_statement, $.primary_expression],
     [$.type_alias_statement, $.primary_expression],
   ],
 
@@ -83,28 +78,50 @@ module.exports = grammar({
     $._suite,
     $._expressions,
     $._left_hand_side,
-    $.keyword_identifier,
   ],
 
   word: ($) => $.identifier,
 
   rules: {
-    source_file: ($) =>
+    source: ($) =>
       seq(
-        seq("module", $.module),
+        optional(seq("module", $.module)),
         repeat($.import),
-        repeat(choice($.record, $.trait, $.enum))
+        repeat($.const),
+        repeat(choice($.record, $.trait, $.enum, $.fn, $.test))
       ),
 
     module: ($) => $.identifier,
 
     import: ($) => seq("import", $.url),
     url: ($) => sep1(/[a-zA-Z_][a-zA-Z_0-9]*/, "/"),
+
+    const: ($) =>
+      seq(
+        field("name", $.const_identifier),
+        "=",
+        field("value", $.const_literal)
+      ),
+
+    const_literal: ($) =>
+      choice(
+        $.integer,
+        $.float,
+        $.true,
+        $.false,
+        $.string,
+        $.list,
+        $.map
+        // $.const_paranthesized
+      ),
+
+    const_paranthesized: ($) =>
+      prec(PREC.parenthesized_expression, seq("(", $.const_literal, ")")),
+
     generic_list: ($) => seq("[", commaSep1($.generic_type2), "]"),
     generic_type2: ($) =>
       seq($.identifier, optional(seq(":", sep1($.identifier, "&")))),
     type2: ($) => seq($.identifier, optional("?")),
-
 
     record: ($) =>
       seq(
@@ -125,19 +142,16 @@ module.exports = grammar({
         field("fields", seq("(", repeat($.trait_field), ")"))
       ),
 
-    trait_field: $ => seq(
-      'fn',
-      field('name', $.identifier),
-      field('params', seq('(', optional(commaSep1($.param)), ')')),
-      ':',
-      field('returns', optional(commaSep1($.type2))),
-    ),
+    trait_field: ($) =>
+      seq(
+        "fn",
+        field("name", $.identifier),
+        field("params", seq("(", optional(commaSep1($.param)), ")")),
+        ":",
+        field("returns", optional(commaSep1($.type2)))
+      ),
 
-    param: $ => seq(
-      field('name', $.identifier),
-      ':',
-      field('type', $.type2)
-    ),
+    param: ($) => seq(field("name", $.identifier), ":", field("type", $.type2)),
 
     enum: ($) =>
       seq(
@@ -150,119 +164,37 @@ module.exports = grammar({
     enum_field: ($) =>
       seq("|", field("name", $.identifier), "(", commaSep1($.identifier), ")"),
 
-    _statement: ($) => choice($._simple_statements, $._compound_statement),
-
-    _simple_statements: ($) =>
+    fn: ($) =>
       seq(
-        sep1($._simple_statement, SEMICOLON),
-        optional(SEMICOLON),
-        $._newline
+        optional($.decorator),
+        "fn",
+        field("name", choice($.identifier, $._extension)),
+        field("params", seq("(", optional(commaSep1($.param)), ")")),
+        ":",
+        field("returns", optional(commaSep1($.type2))),
+        "=",
+        $.body
       ),
+
+    decorator: ($) => seq("#", "[", $.expression, "]", $._newline),
+
+    body: ($) =>
+      seq($._indent, optional($.doc_comment), repeat($._statement), $._dedent),
+
+    test: ($) => seq("test", "(", $.string, ")", $.lambda),
+
+    _statement: ($) => choice($.pass_statement, $.for_statement),
 
     _simple_statement: ($) =>
       choice(
-        $.future_import_statement,
-        $.import_statement,
-        $.import_from_statement,
-        $.print_statement,
         $.assert_statement,
-        $.expression_statement,
+        // $.expression_statement,
         $.return_statement,
-        $.delete_statement,
         $.raise_statement,
         $.pass_statement,
         $.break_statement,
-        $.continue_statement,
-        $.global_statement,
-        $.nonlocal_statement,
-        $.exec_statement,
-        $.type_alias_statement
+        $.continue_statement
       ),
-
-    import_statement: ($) => seq("import", $._import_list),
-
-    import_prefix: (_) => repeat1("."),
-
-    _simple_statements: ($) =>
-      seq(
-        sep1($._simple_statement, SEMICOLON),
-        optional(SEMICOLON),
-        $._newline
-      ),
-
-    _simple_statement: ($) =>
-      choice(
-        $.import_statement,
-        $.import_from_statement,
-        $.print_statement,
-        $.assert_statement,
-        $.expression_statement,
-        $.return_statement,
-        $.delete_statement,
-        $.raise_statement,
-        $.pass_statement,
-        $.break_statement,
-        $.continue_statement,
-        $.global_statement,
-        $.nonlocal_statement,
-        $.exec_statement,
-        $.type_alias_statement
-      ),
-
-    relative_import: ($) => seq($.import_prefix, optional($.dotted_name)),
-
-    future_import_statement: ($) =>
-      seq(
-        "from",
-        "__future__",
-        "import",
-        choice($._import_list, seq("(", $._import_list, ")"))
-      ),
-
-    import_from_statement: ($) =>
-      seq(
-        "from",
-        field("module_name", choice($.relative_import, $.dotted_name)),
-        "import",
-        choice($.wildcard_import, $._import_list, seq("(", $._import_list, ")"))
-      ),
-
-    _import_list: ($) =>
-      seq(
-        commaSep1(field("name", choice($.dotted_name, $.aliased_import))),
-        optional(",")
-      ),
-
-    aliased_import: ($) =>
-      seq(field("name", $.dotted_name), "as", field("alias", $.identifier)),
-
-    wildcard_import: (_) => "*",
-
-    print_statement: ($) =>
-      choice(
-        prec(
-          1,
-          seq(
-            "print",
-            $.chevron,
-            repeat(seq(",", field("argument", $.expression))),
-            optional(",")
-          )
-        ),
-        prec(
-          -3,
-          prec.dynamic(
-            -1,
-            seq(
-              "print",
-              commaSep1(field("argument", $.expression)),
-              optional(",")
-            )
-          )
-        )
-      ),
-
-    chevron: ($) => seq(">>", $.expression),
 
     assert_statement: ($) => seq("assert", commaSep1($.expression)),
 
@@ -271,22 +203,19 @@ module.exports = grammar({
         $.expression,
         seq(commaSep1($.expression), optional(",")),
         $.assignment,
-        $.augmented_assignment,
-        $.yield
+        $.augmented_assignment
       ),
 
     named_expression: ($) =>
       seq(
         field("name", $._named_expression_lhs),
-        ":=",
+        "=",
         field("value", $.expression)
       ),
 
-    _named_expression_lhs: ($) => choice($.identifier, $.keyword_identifier),
+    _named_expression_lhs: ($) => $.identifier,
 
     return_statement: ($) => seq("return", optional($._expressions)),
-
-    delete_statement: ($) => seq("del", $._expressions),
 
     _expressions: ($) => choice($.expression, $.expression_list),
 
@@ -302,18 +231,13 @@ module.exports = grammar({
     continue_statement: (_) => prec.left("continue"),
 
     // Compound statements
-
     _compound_statement: ($) =>
       choice(
-        $.if_statement,
         $.for_statement,
-        $.while_statement,
-        $.try_statement,
-        $.with_statement,
-        $.function_definition,
-        $.class_definition,
-        $.decorated_definition,
-        $.match_statement
+        $.while_statement
+        // $.if_statement,
+        // $.try_statement,
+        // $.match_statement
       ),
 
     if_statement: ($) =>
@@ -361,16 +285,23 @@ module.exports = grammar({
         field("consequence", $._suite)
       ),
 
+    assignment: ($) =>
+      seq(
+        field("left", $._left_hand_side),
+        seq("=", field("right", $._right_hand_side))
+      ),
+
+    reference: ($) => seq($.identifier, optional(seq(".", $.identifier))),
+    range_value: ($) => choice($.integer, $.reference, $.list, $.map),
+
     for_statement: ($) =>
       seq(
-        optional("async"),
         "for",
-        field("left", $._left_hand_side),
-        "in",
-        field("right", $._expressions),
-        ":",
-        field("body", $._suite),
-        field("alternative", optional($.else_clause))
+        field("left", commaSep1($.identifier)),
+        ":=",
+        "range",
+        field("right", $.range_value),
+        field("body", $.body)
       ),
 
     while_statement: ($) =>
@@ -422,113 +353,29 @@ module.exports = grammar({
 
     finally_clause: ($) => seq("finally", ":", $._suite),
 
-    with_statement: ($) =>
-      seq(
-        optional("async"),
-        "with",
-        $.with_clause,
-        ":",
-        field("body", $._suite)
-      ),
-
-    with_clause: ($) =>
-      choice(
-        seq(commaSep1($.with_item), optional(",")),
-        seq("(", commaSep1($.with_item), optional(","), ")")
-      ),
-
-    with_item: ($) => prec.dynamic(1, seq(field("value", $.expression))),
-
-    function_definition: ($) =>
-      seq(
-        optional("async"),
-        "def",
-        field("name", $.identifier),
-        field("type_parameters", optional($.type_parameter)),
-        field("parameters", $.parameters),
-        optional(seq("->", field("return_type", $.type))),
-        ":",
-        field("body", $._suite)
-      ),
-
     parameters: ($) => seq("(", optional($._parameters), ")"),
-
-    lambda_parameters: ($) => $._parameters,
-
-    list_splat: ($) => seq("*", $.expression),
-
-    dictionary_splat: ($) => seq("**", $.expression),
 
     global_statement: ($) => seq("global", commaSep1($.identifier)),
 
     nonlocal_statement: ($) => seq("nonlocal", commaSep1($.identifier)),
 
-    exec_statement: ($) =>
-      seq(
-        "exec",
-        field("code", choice($.string, $.identifier)),
-        optional(seq("in", commaSep1($.expression)))
-      ),
-
     type_alias_statement: ($) =>
       prec.dynamic(1, seq("type", $.type, "=", $.type)),
 
-    class_definition: ($) =>
-      seq(
-        "class",
-        field("name", $.identifier),
-        field("type_parameters", optional($.type_parameter)),
-        field("superclasses", optional($.argument_list)),
-        ":",
-        field("body", $._suite)
-      ),
     type_parameter: ($) => seq("[", commaSep1($.type), "]"),
-
-    parenthesized_list_splat: ($) =>
-      prec(
-        PREC.parenthesized_list_splat,
-        seq(
-          "(",
-          choice(
-            alias($.parenthesized_list_splat, $.parenthesized_expression),
-            $.list_splat
-          ),
-          ")"
-        )
-      ),
 
     argument_list: ($) =>
       seq(
         "(",
-        optional(
-          commaSep1(
-            choice(
-              $.expression,
-              $.list_splat,
-              $.dictionary_splat,
-              alias($.parenthesized_list_splat, $.parenthesized_expression),
-              $.keyword_argument
-            )
-          )
-        ),
+        optional(commaSep1(choice($.expression, $.keyword_argument))),
         optional(","),
         ")"
       ),
 
-    decorated_definition: ($) =>
-      seq(
-        repeat1($.decorator),
-        field("definition", choice($.class_definition, $.function_definition))
-      ),
+    keyword_argument: ($) =>
+      seq(field("name", $.identifier), ":", field("value", $.expression)),
 
-    decorator: ($) => seq("@", $.expression, $._newline),
-
-    _suite: ($) =>
-      choice(
-        alias($._simple_statements, $.block),
-        seq($._indent, $.block),
-        alias($._newline, $.block)
-      ),
+    _suite: ($) => choice(seq($._indent, $.block), alias($._newline, $.block)),
 
     block: ($) => seq(repeat($._statement), $._dedent),
 
@@ -561,14 +408,11 @@ module.exports = grammar({
           $.class_pattern,
           $.splat_pattern,
           $.union_pattern,
-          alias($._list_pattern, $.list_pattern),
-          alias($._tuple_pattern, $.tuple_pattern),
           $.dict_pattern,
           $.string,
-          $.concatenated_string,
           $.true,
           $.false,
-          $.none,
+          $.nil,
           seq(optional("-"), choice($.integer, $.float)),
           $.complex_pattern,
           $.dotted_name,
@@ -585,9 +429,6 @@ module.exports = grammar({
 
     _list_pattern: ($) =>
       seq("[", optional(seq(commaSep1($.case_pattern), optional(","))), "]"),
-
-    _tuple_pattern: ($) =>
-      seq("(", optional(seq(commaSep1($.case_pattern), optional(","))), ")"),
 
     dict_pattern: ($) =>
       seq(
@@ -640,34 +481,17 @@ module.exports = grammar({
         $.typed_parameter,
         $.default_parameter,
         $.typed_default_parameter,
-        $.list_splat_pattern,
-        $.tuple_pattern,
         $.keyword_separator,
-        $.positional_separator,
-        $.dictionary_splat_pattern
+        $.positional_separator
       ),
 
     pattern: ($) =>
-      choice(
-        $.identifier,
-        $.keyword_identifier,
-        $.subscript,
-        $.attribute,
-        $.list_splat_pattern,
-        $.tuple_pattern,
-        $.list_pattern
-      ),
-
-    tuple_pattern: ($) => seq("(", optional($._patterns), ")"),
+      choice($.identifier, $.subscript, $.attribute, $.list_pattern),
 
     list_pattern: ($) => seq("[", optional($._patterns), "]"),
 
     default_parameter: ($) =>
-      seq(
-        field("name", choice($.identifier, $.tuple_pattern)),
-        "=",
-        field("value", $.expression)
-      ),
+      seq(field("name", $.identifier), "=", field("value", $.expression)),
 
     typed_default_parameter: ($) =>
       prec(
@@ -679,18 +503,6 @@ module.exports = grammar({
           "=",
           field("value", $.expression)
         )
-      ),
-
-    list_splat_pattern: ($) =>
-      seq(
-        "*",
-        choice($.identifier, $.keyword_identifier, $.subscript, $.attribute)
-      ),
-
-    dictionary_splat_pattern: ($) =>
-      seq(
-        "**",
-        choice($.identifier, $.keyword_identifier, $.subscript, $.attribute)
       ),
 
     // Extended patterns (patterns allowed in match statement are far more flexible than simple patterns though still a subset of "expression")
@@ -706,9 +518,6 @@ module.exports = grammar({
 
     // Expressions
 
-    _expression_within_for_in_clause: ($) =>
-      choice($.expression, alias($.lambda_within_for_in_clause, $.lambda)),
-
     expression: ($) =>
       choice(
         $.comparison_operator,
@@ -723,36 +532,24 @@ module.exports = grammar({
 
     primary_expression: ($) =>
       choice(
-        $.await,
         $.binary_operator,
         $.identifier,
-        $.keyword_identifier,
         $.string,
-        $.concatenated_string,
         $.integer,
         $.float,
         $.true,
         $.false,
-        $.none,
+        $.nil,
         $.unary_operator,
         $.attribute,
-        $.subscript,
         $.call,
         $.list,
-        $.list_comprehension,
-        $.dictionary,
-        $.dictionary_comprehension,
-        $.set,
-        $.set_comprehension,
-        $.tuple,
-        $.parenthesized_expression,
-        $.generator_expression,
-        $.ellipsis,
-        alias($.list_splat_pattern, $.list_splat)
+        $.map
+        // $.parenthesized_expression
       ),
 
     not_operator: ($) =>
-      prec(PREC.not, seq("not", field("argument", $.expression))),
+      prec(PREC.not, seq("!", field("argument", $.expression))),
 
     boolean_operator: ($) =>
       choice(
@@ -760,7 +557,7 @@ module.exports = grammar({
           PREC.and,
           seq(
             field("left", $.expression),
-            field("operator", "and"),
+            field("operator", "&&"),
             field("right", $.expression)
           )
         ),
@@ -768,7 +565,7 @@ module.exports = grammar({
           PREC.or,
           seq(
             field("left", $.expression),
-            field("operator", "or"),
+            field("operator", "||"),
             field("right", $.expression)
           )
         )
@@ -811,7 +608,7 @@ module.exports = grammar({
       prec(
         PREC.unary,
         seq(
-          field("operator", choice("+", "-", "~")),
+          field("operator", choice("+", "-")),
           field("argument", $.primary_expression)
         )
       ),
@@ -825,19 +622,7 @@ module.exports = grammar({
             seq(
               field(
                 "operators",
-                choice(
-                  "<",
-                  "<=",
-                  "==",
-                  "!=",
-                  ">=",
-                  ">",
-                  "<>",
-                  "in",
-                  alias(seq("not", "in"), "not in"),
-                  "is",
-                  alias(seq("is", "not"), "is not")
-                )
+                choice("<", "<=", "==", "!=", ">=", ">", "<>")
               ),
               $.primary_expression
             )
@@ -849,34 +634,17 @@ module.exports = grammar({
       prec(
         PREC.lambda,
         seq(
-          "lambda",
-          field("parameters", optional($.lambda_parameters)),
-          ":",
-          field("body", $.expression)
+          "|",
+          field("parameters", optional(commaSep1($.identifier))),
+          "|",
+          field("body", $.body)
         )
-      ),
-
-    lambda_within_for_in_clause: ($) =>
-      seq(
-        "lambda",
-        field("parameters", optional($.lambda_parameters)),
-        ":",
-        field("body", $._expression_within_for_in_clause)
       ),
 
     assignment: ($) =>
       seq(
         field("left", $._left_hand_side),
-        choice(
-          seq("=", field("right", $._right_hand_side)),
-          seq(":", field("type", $.type)),
-          seq(
-            ":",
-            field("type", $.type),
-            "=",
-            field("right", $._right_hand_side)
-          )
-        )
+        seq("=", field("right", $._right_hand_side))
       ),
 
     augmented_assignment: ($) =>
@@ -917,16 +685,7 @@ module.exports = grammar({
         $.expression_list,
         $.assignment,
         $.augmented_assignment,
-        $.pattern_list,
-        $.yield
-      ),
-
-    yield: ($) =>
-      prec.right(
-        seq(
-          "yield",
-          choice(seq("from", $.expression), optional($._expressions))
-        )
+        $.pattern_list
       ),
 
     attribute: ($) =>
@@ -959,29 +718,19 @@ module.exports = grammar({
         optional(seq(":", optional($.expression)))
       ),
 
-    ellipsis: (_) => "...",
-
     call: ($) =>
       prec(
         PREC.call,
         seq(
           field("function", $.primary_expression),
-          field("arguments", choice($.generator_expression, $.argument_list))
+          field("arguments", $.argument_list)
         )
       ),
 
     typed_parameter: ($) =>
       prec(
         PREC.typed_parameter,
-        seq(
-          choice(
-            $.identifier,
-            $.list_splat_pattern,
-            $.dictionary_splat_pattern
-          ),
-          ":",
-          field("type", $.type)
-        )
+        seq(choice($.identifier), ":", field("type", $.type))
       ),
 
     type: ($) =>
@@ -998,75 +747,6 @@ module.exports = grammar({
     union_type: ($) => prec.left(seq($.type, "|", $.type)),
     constrained_type: ($) => prec.right(seq($.type, ":", $.type)),
     member_type: ($) => seq($.type, ".", $.identifier),
-
-    keyword_argument: ($) =>
-      seq(field("name", $.identifier), "=", field("value", $.expression)),
-
-    // Literals
-
-    list: ($) => seq("[", optional($._collection_elements), "]"),
-
-    set: ($) => seq("{", $._collection_elements, "}"),
-
-    tuple: ($) => seq("(", optional($._collection_elements), ")"),
-
-    dictionary: ($) =>
-      seq(
-        "{",
-        optional(commaSep1(choice($.pair, $.dictionary_splat))),
-        optional(","),
-        "}"
-      ),
-
-    pair: ($) =>
-      seq(field("key", $.expression), ":", field("value", $.expression)),
-
-    list_comprehension: ($) =>
-      seq("[", field("body", $.expression), $._comprehension_clauses, "]"),
-
-    dictionary_comprehension: ($) =>
-      seq("{", field("body", $.pair), $._comprehension_clauses, "}"),
-
-    set_comprehension: ($) =>
-      seq("{", field("body", $.expression), $._comprehension_clauses, "}"),
-
-    generator_expression: ($) =>
-      seq("(", field("body", $.expression), $._comprehension_clauses, ")"),
-
-    _comprehension_clauses: ($) =>
-      seq($.for_in_clause, repeat(choice($.for_in_clause, $.if_clause))),
-
-    parenthesized_expression: ($) =>
-      prec(
-        PREC.parenthesized_expression,
-        seq("(", choice($.expression, $.yield), ")")
-      ),
-
-    _collection_elements: ($) =>
-      seq(
-        commaSep1(
-          choice(
-            $.expression,
-            $.yield,
-            $.list_splat,
-            $.parenthesized_list_splat
-          )
-        ),
-        optional(",")
-      ),
-
-    for_in_clause: ($) =>
-      prec.left(
-        seq(
-          optional("async"),
-          "for",
-          field("left", $._left_hand_side),
-          "in",
-          field("right", commaSep1($._expression_within_for_in_clause)),
-          optional(",")
-        )
-      ),
-
     if_clause: ($) => seq("if", $.expression),
 
     conditional_expression: ($) =>
@@ -1075,14 +755,19 @@ module.exports = grammar({
         seq($.expression, "if", $.expression, "else", $.expression)
       ),
 
-    concatenated_string: ($) => seq($.string, repeat1($.string)),
+    // string: ($) =>
+    //   seq(
+    //     '"',
+    //     repeat(choice($.escape_sequence, $.quoted_content)),
+    //     token.immediate('"')
+    //   ),
+    // escape_sequence: ($) =>
+    //   choice(
+    //     token.immediate(/\\[efnrt\"\\]/),
+    //     token.immediate(/\\u\{[0-9a-fA-F]{1,6}\}/)
+    //   ),
 
-    string: ($) =>
-      seq(
-        $.string_start,
-        repeat(choice($.interpolation, $.string_content)),
-        $.string_end
-      ),
+    string: ($) => seq($.string_start, repeat($._string_content), $.string_end),
 
     string_content: ($) =>
       prec.right(
@@ -1107,7 +792,7 @@ module.exports = grammar({
       ),
 
     _f_expression: ($) =>
-      choice($.expression, $.expression_list, $.pattern_list, $.yield),
+      choice($.expression, $.expression_list, $.pattern_list),
 
     escape_sequence: (_) =>
       token.immediate(
@@ -1143,6 +828,19 @@ module.exports = grammar({
 
     type_conversion: (_) => /![a-z]/,
 
+    list: ($) => seq("[", commaSep1($.expression), "]"),
+
+    symbol: ($) => seq(":", $.identifier),
+    key: ($) => choice($.symbol, $.identifier),
+    value: ($) => $.expression,
+    key_value: ($) => seq($.key, "=>", $.value),
+    map: ($) => seq("[", commaSep1($.key_value), "]"),
+
+    _hex: ($) => /0[xX][0-9a-fA-F_]+/,
+    _decimal: ($) => /[0-9][0-9_]*/,
+    _octal: ($) => /0[oO][0-7_]+/,
+    _binary: ($) => /0[bB][0-1_]+/,
+
     integer: (_) =>
       token(
         choice(
@@ -1169,33 +867,29 @@ module.exports = grammar({
             seq(digits, ".", optional(digits), optional(exponent)),
             seq(optional(digits), ".", digits, optional(exponent)),
             seq(digits, exponent)
-          ),
-          optional(choice(/[Ll]/, /[jJ]/))
+          )
         )
       );
     },
 
     identifier: (_) => /[_\p{XID_Start}][_\p{XID_Continue}]*/,
+    _interpolation: ($) => choice(seq("{", $.identifier, "}")),
+
+    const_identifier: (_) => /[A-Z]+(?:_[A-Z]+)*/, // capitalized snake case
+    _extension: ($) => seq($.identifier, ".", $.identifier),
 
     keyword_identifier: ($) =>
       choice(
-        prec(
-          -3,
-          alias(
-            choice("print", "exec", "async", "await", "match"),
-            $.identifier
-          )
-        ),
+        prec(-3, alias(choice("print", "exec", "match"), $.identifier)),
         alias("type", $.identifier)
       ),
 
-    true: (_) => "True",
-    false: (_) => "False",
-    none: (_) => "None",
+    true: (_) => "true",
+    false: (_) => "false",
+    nil: (_) => "nil",
 
-    await: ($) => prec(PREC.unary, seq("await", $.primary_expression)),
-
-    comment: (_) => token(seq("#", /.*/)),
+    comment: (_) => token(seq("//", /.*/)),
+    doc_comment: (_) => token(seq("`", /.*/)),
 
     line_continuation: (_) =>
       token(seq("\\", choice(seq(optional("\r"), "\n"), "\0"))),
@@ -1231,4 +925,31 @@ function commaSep1(rule) {
  */
 function sep1(rule, separator) {
   return seq(rule, repeat(seq(separator, rule)));
+}
+
+function arithmeticExpression(exprType) {
+  return choice(
+    binaryExpr(prec.left, 1, "||", exprType),
+    binaryExpr(prec.left, 2, "&&", exprType),
+    binaryExpr(prec.left, 3, "==", exprType),
+    binaryExpr(prec.left, 3, "!=", exprType),
+    binaryExpr(prec.left, 4, "<", exprType),
+    binaryExpr(prec.left, 4, "<=", exprType),
+    binaryExpr(prec.left, 4, ">", exprType),
+    binaryExpr(prec.left, 4, ">=", exprType),
+    binaryExpr(prec.left, 5, "|>", exprType),
+    binaryExpr(prec.left, 6, "+", exprType),
+    binaryExpr(prec.left, 6, "-", exprType),
+    binaryExpr(prec.left, 7, "*", exprType),
+    binaryExpr(prec.left, 7, "/", exprType),
+    binaryExpr(prec.left, 7, "%", exprType),
+    binaryExpr(prec.left, 7, "<>", exprType)
+  );
+}
+
+function binaryExpr(assoc, precedence, operator, expr) {
+  return assoc(
+    precedence,
+    seq(field("left", expr), field("operator", operator), field("right", expr))
+  );
 }
