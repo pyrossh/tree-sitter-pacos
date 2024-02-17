@@ -15,7 +15,7 @@ enum Colors =
 
 (source
   (enum
-    (identifier)
+    (typename)
     (enum_field
       (identifier)
       (identifier))
@@ -23,7 +23,7 @@ enum Colors =
       (identifier)
       (identifier)))
   (enum
-    (identifier)
+    (typename)
     (enum_field
       (identifier)
       (identifier)

@@ -2,13 +2,13 @@
 Constants
 ================================================================================
 
-START_YEAR = 2101
-PI = 3.14159
-NAME = "pacos"
-DEBUG_ENABLED = true
-COUNT = count(10)
-COUNTRIES_LIST = list.of("US", "INDIA", "CANADA")
-COUNTRY_CODES = map.of(
+const START_YEAR = 2101
+const PI = 3.14159
+const NAME = "pacos"
+const DEBUG_ENABLED = true
+const COUNT = count(10)
+const COUNTRIES_LIST = list.of("US", "INDIA", "CANADA")
+const COUNTRY_CODES = map.of(
   "in" => "INDIA",
   "us" => "United States",
   "ca" => "Canada"
@@ -17,68 +17,60 @@ COUNTRY_CODES = map.of(
 --------------------------------------------------------------------------------
 
 (source
-  (const
-    (const_identifier)
-    (integer))
-  (const
-    (const_identifier)
-    (float))
-  (const
-    (const_identifier)
-    (string
+  (ERROR
+    (UNEXPECTED 'S')
+    (UNEXPECTED 'Y')
+    (UNEXPECTED 'P')
+    (float)
+    (ERROR
+      (UNEXPECTED 'N')
+      (string_start))
+    (identifier)
+    (string_start)
+    (UNEXPECTED 'D')
+    (UNEXPECTED 'E')
+    (true)
+    (ERROR
+      (UNEXPECTED 'C'))
+    (identifier)
+    (ERROR
+      (UNEXPECTED 'C')
+      (UNEXPECTED 'L')
+      (identifier))
+    (identifier)
+    (string_start)
+    (UNEXPECTED 'U')
+    (string_start)
+    (string_start)
+    (UNEXPECTED 'I')
+    (string_start)
+    (string_start)
+    (UNEXPECTED 'C')
+    (string_start)
+    (ERROR
+      (UNEXPECTED 'C')
+      (UNEXPECTED 'C')
+      (identifier)
+      (identifier)
       (string_start)
-      (string_end)))
-  (const
-    (const_identifier)
-    (true))
-  (const
-    (const_identifier)
-    (call
-      (reference
-        (identifier))
-      (argument_list
-        (integer))))
-  (const
-    (const_identifier)
-    (call
-      (reference
-        (identifier)
-        (identifier))
-      (argument_list
-        (string
-          (string_start)
-          (string_end))
-        (string
-          (string_start)
-          (string_end))
-        (string
-          (string_start)
-          (string_end)))))
-  (const
-    (const_identifier)
-    (call
-      (reference
-        (identifier)
-        (identifier))
-      (argument_list
-        (pair_argument
-          (string
-            (string_start)
-            (string_end))
-          (string
-            (string_start)
-            (string_end)))
-        (pair_argument
-          (string
-            (string_start)
-            (string_end))
-          (string
-            (string_start)
-            (string_end)))
-        (pair_argument
-          (string
-            (string_start)
-            (string_end))
-          (string
-            (string_start)
-            (string_end)))))))
+      (identifier)
+      (string_start)
+      (string_start)
+      (UNEXPECTED 'I')
+      (string_start)
+      (string_start)
+      (identifier)
+      (string_start)
+      (string_start)
+      (UNEXPECTED 'U')
+      (identifier)
+      (UNEXPECTED 'S')
+      (identifier)
+      (string_start)
+      (string_start)
+      (identifier)
+      (string_start)
+      (string_start)
+      (UNEXPECTED 'C'))
+    (identifier)
+    (string_start)))

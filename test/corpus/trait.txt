@@ -14,25 +14,25 @@ trait Stringable(
 
 (source
   (trait
-    (identifier)
+    (typename)
     (generic_list
-      (generic_type2
-        (identifier)))
+      (generic_type
+        (typename)))
     (trait_field
       (identifier)
       (param
         (identifier)
-        (type2
-          (identifier)))
+        (type
+          (typename)))
       (param
         (identifier)
-        (type2
-          (identifier)))
-      (type2
-        (identifier))))
+        (type
+          (typename)))
+      (type
+        (typename))))
   (trait
-    (identifier)
+    (typename)
     (trait_field
       (identifier)
-      (type2
-        (identifier)))))
+      (type
+        (typename)))))

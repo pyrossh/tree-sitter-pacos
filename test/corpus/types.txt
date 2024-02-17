@@ -1,13 +1,43 @@
 ================================================================================
+primitive
+================================================================================
+
+test("primitive") |t|
+  a := true
+  b := false
+  c := nil
+
+--------------------------------------------------------------------------------
+
+(source
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
+      (identifier)
+      (body
+        (assignment_statement
+          (identifier)
+          (true))
+        (assignment_statement
+          (identifier)
+          (false))
+        (assignment_statement
+          (identifier)
+          (nil))))))
+
+================================================================================
 int
 ================================================================================
 
 test("int") |t|
   a := +123
   b := -111
-  c := 11l
+  c := 456
   d := 0xcafe
   e := 0b001
+  f := 25i
 
 --------------------------------------------------------------------------------
 
@@ -27,6 +57,9 @@ test("int") |t|
           (identifier)
           (unary_operator
             (integer)))
+        (assignment_statement
+          (identifier)
+          (integer))
         (assignment_statement
           (identifier)
           (integer))
@@ -42,11 +75,10 @@ float
 ================================================================================
 
 test("float") |t|
-  a := +123
-  b := -111
-  c := 11l
-  d := 0xcafe
-  e := 0b001
+  a := +1.2
+  b := -0.4
+  c := 12.0f
+  d := 15.03f
 
 --------------------------------------------------------------------------------
 
@@ -61,43 +93,69 @@ test("float") |t|
         (assignment_statement
           (identifier)
           (unary_operator
-            (integer)))
+            (float)))
         (assignment_statement
           (identifier)
-          (unary_operator
-            (integer)))
+          (float))
         (assignment_statement
           (identifier)
-          (integer))
+          (float))
         (assignment_statement
           (identifier)
-          (integer))
-        (assignment_statement
-          (identifier)
-          (integer))))))
+          (float))))))
 
 ================================================================================
-Strings
+str
 ================================================================================
 
-test("strings") |t|
-  item := "123"
+test("str") |t|
+  a := "123"
+  b := "\x12 \123 \u1234"
+  c := """
+  A double quote hello,
+  without double or single quotes.
+  """
 
 --------------------------------------------------------------------------------
 
 (source
-  (test
-    (string
-      (string_start)
-      (string_end))
-    (lambda
+  (ERROR
+    (ERROR
+      (string
+        (string_start)
+        (string_end))
       (identifier)
-      (body
-        (assignment_statement
+      (assignment_statement
+        (identifier)
+        (string
+          (string_start)
+          (string_end)))
+      (assignment_statement
+        (identifier)
+        (ERROR
+          (string_start)
           (identifier)
-          (string
-            (string_start)
-            (string_end)))))))
+          (UNEXPECTED '1'))
+        (integer))
+      (ERROR
+        (UNEXPECTED 'u'))
+      (identifier)
+      (string
+        (string_start)
+        (string_end))
+      (string
+        (string_start)
+        (string_end))
+      (UNEXPECTED 'A')
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    (string_start)))
 
 ================================================================================
 List

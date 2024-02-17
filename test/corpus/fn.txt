@@ -13,6 +13,9 @@ fn create_post_action(req: Request): Response =
 fn fetch_all_posts(req: Request): Response =
   pass
 
+fn add[T: int | float](a: List[T], b: List[T]): List[T] =
+  pass
+
 --------------------------------------------------------------------------------
 
 (source
@@ -20,10 +23,10 @@ fn fetch_all_posts(req: Request): Response =
     (identifier)
     (param
       (identifier)
-      (type2
-        (identifier)))
-    (type2
-      (identifier))
+      (type
+        (typename)))
+    (type
+      (typename))
     (body
       (doc_comment)
       (pass_statement)))
@@ -31,10 +34,10 @@ fn fetch_all_posts(req: Request): Response =
     (identifier)
     (param
       (identifier)
-      (type2
-        (identifier)))
-    (type2
-      (identifier))
+      (type
+        (typename)))
+    (type
+      (typename))
     (body
       (pass_statement)))
   (fn
@@ -49,9 +52,37 @@ fn fetch_all_posts(req: Request): Response =
     (identifier)
     (param
       (identifier)
-      (type2
-        (identifier)))
-    (type2
-      (identifier))
+      (type
+        (typename)))
+    (type
+      (typename))
+    (body
+      (pass_statement)))
+  (fn
+    (identifier)
+    (generic_list
+      (generic_type
+        (typename)
+        (typename)
+        (typename)))
+    (param
+      (identifier)
+      (type
+        (typename)
+        (generic_list
+          (generic_type
+            (typename)))))
+    (param
+      (identifier)
+      (type
+        (typename)
+        (generic_list
+          (generic_type
+            (typename)))))
+    (type
+      (typename)
+      (generic_list
+        (generic_type
+          (typename))))
     (body
       (pass_statement))))

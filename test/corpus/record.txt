@@ -23,54 +23,54 @@ record Dog[A: Compare & String, B](
 
 (source
   (record
-    (identifier)
+    (typename)
     (record_field
       (identifier)
-      (type2
-        (identifier)))
+      (type
+        (typename)))
     (record_field
       (identifier)
-      (type2
-        (identifier))))
+      (type
+        (typename))))
   (record
-    (identifier)
+    (typename)
     (record_field
       (identifier)
-      (type2
-        (identifier)))
+      (type
+        (typename)))
     (record_field
       (identifier)
-      (type2
-        (identifier))))
+      (type
+        (typename))))
   (record
-    (identifier)
+    (typename)
     (generic_list
-      (generic_type2
-        (identifier))
-      (generic_type2
-        (identifier)))
+      (generic_type
+        (typename))
+      (generic_type
+        (typename)))
     (record_field
       (identifier)
-      (type2
-        (identifier)))
+      (type
+        (typename)))
     (record_field
       (identifier)
-      (type2
-        (identifier))))
+      (type
+        (typename))))
   (record
-    (identifier)
+    (typename)
     (generic_list
-      (generic_type2
-        (identifier)
-        (identifier)
-        (identifier))
-      (generic_type2
-        (identifier)))
+      (generic_type
+        (typename)
+        (typename)
+        (typename))
+      (generic_type
+        (typename)))
     (record_field
       (identifier)
-      (type2
-        (identifier)))
+      (type
+        (typename)))
     (record_field
       (identifier)
-      (type2
-        (identifier)))))
+      (type
+        (typename)))))
