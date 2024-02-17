@@ -12,6 +12,12 @@ Integers
 
 (source
   (ERROR
+    (integer)
+    (integer)
+    (integer)
+    (identifier)
+    (integer)
+    (integer)
     (identifier)))
 
 ================================================================================
@@ -27,6 +33,7 @@ Unicode escape sequences
     (string_start)
     (identifier)
     (UNEXPECTED '1')
+    (integer)
     (UNEXPECTED 'u')
     (identifier)
     (string_start)))

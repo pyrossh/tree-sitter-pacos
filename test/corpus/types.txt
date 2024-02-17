@@ -1,0 +1,236 @@
+================================================================================
+int
+================================================================================
+
+test("int") |t|
+  a := +123
+  b := -111
+  c := 11l
+  d := 0xcafe
+  e := 0b001
+
+--------------------------------------------------------------------------------
+
+(source
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
+      (identifier)
+      (body
+        (assignment_statement
+          (identifier)
+          (unary_operator
+            (integer)))
+        (assignment_statement
+          (identifier)
+          (unary_operator
+            (integer)))
+        (assignment_statement
+          (identifier)
+          (integer))
+        (assignment_statement
+          (identifier)
+          (integer))
+        (assignment_statement
+          (identifier)
+          (integer))))))
+
+================================================================================
+float
+================================================================================
+
+test("float") |t|
+  a := +123
+  b := -111
+  c := 11l
+  d := 0xcafe
+  e := 0b001
+
+--------------------------------------------------------------------------------
+
+(source
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
+      (identifier)
+      (body
+        (assignment_statement
+          (identifier)
+          (unary_operator
+            (integer)))
+        (assignment_statement
+          (identifier)
+          (unary_operator
+            (integer)))
+        (assignment_statement
+          (identifier)
+          (integer))
+        (assignment_statement
+          (identifier)
+          (integer))
+        (assignment_statement
+          (identifier)
+          (integer))))))
+
+================================================================================
+Strings
+================================================================================
+
+test("strings") |t|
+  item := "123"
+
+--------------------------------------------------------------------------------
+
+(source
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
+      (identifier)
+      (body
+        (assignment_statement
+          (identifier)
+          (string
+            (string_start)
+            (string_end)))))))
+
+================================================================================
+List
+================================================================================
+
+test("List") |t|
+  a := list.of(1, 2, 3)
+  b := list.of(list.of(1), list.of(2), list.of(3))
+  c := list.of(1, 2, 3 * 4, 8, n)
+
+--------------------------------------------------------------------------------
+
+(source
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
+      (identifier)
+      (body
+        (assignment_statement
+          (identifier)
+          (call
+            (reference
+              (identifier)
+              (identifier))
+            (argument_list
+              (integer)
+              (integer)
+              (integer))))
+        (assignment_statement
+          (identifier)
+          (call
+            (reference
+              (identifier)
+              (identifier))
+            (argument_list
+              (call
+                (reference
+                  (identifier)
+                  (identifier))
+                (argument_list
+                  (integer)))
+              (call
+                (reference
+                  (identifier)
+                  (identifier))
+                (argument_list
+                  (integer)))
+              (call
+                (reference
+                  (identifier)
+                  (identifier))
+                (argument_list
+                  (integer))))))
+        (assignment_statement
+          (identifier)
+          (call
+            (reference
+              (identifier)
+              (identifier))
+            (argument_list
+              (integer)
+              (integer)
+              (binary_operator
+                (integer)
+                (integer))
+              (integer)
+              (identifier))))))))
+
+================================================================================
+Map
+================================================================================
+
+test("Map") |t|
+  a := map.of("a" => 1, "b" => 2)
+  b := map.of("a" => 1, "b" => map.of("c" => 3, "d" => 4))
+
+--------------------------------------------------------------------------------
+
+(source
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
+      (identifier)
+      (body
+        (assignment_statement
+          (identifier)
+          (call
+            (reference
+              (identifier)
+              (identifier))
+            (argument_list
+              (pair_argument
+                (string
+                  (string_start)
+                  (string_end))
+                (integer))
+              (pair_argument
+                (string
+                  (string_start)
+                  (string_end))
+                (integer)))))
+        (assignment_statement
+          (identifier)
+          (call
+            (reference
+              (identifier)
+              (identifier))
+            (argument_list
+              (pair_argument
+                (string
+                  (string_start)
+                  (string_end))
+                (integer))
+              (pair_argument
+                (string
+                  (string_start)
+                  (string_end))
+                (call
+                  (reference
+                    (identifier)
+                    (identifier))
+                  (argument_list
+                    (pair_argument
+                      (string
+                        (string_start)
+                        (string_end))
+                      (integer))
+                    (pair_argument
+                      (string
+                        (string_start)
+                        (string_end))
+                      (integer))))))))))))

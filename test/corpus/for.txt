@@ -4,7 +4,7 @@ For
 
 test("for") |t|
   for i := range 10
-    pass
+    assert i == i
 
   for i := range n
     pass
@@ -15,11 +15,11 @@ test("for") |t|
   for v := range data.list
     pass
 
-  for v := range [1, 2, 3]
-    pass
+  for i, v := range [1, 2, 3]
+    assert v == i + 1
 
-  for k, v := range [:a => 1, :b => 2]
-    pass
+  for k, v := range ["a" => 1, "b" => 2]
+    assert k == :a
 
 --------------------------------------------------------------------------------
 
@@ -36,7 +36,10 @@ test("for") |t|
           (range_value
             (integer))
           (body
-            (pass_statement)))
+            (ERROR
+              (identifier)
+              (identifier)
+              (identifier))))
         (for_statement
           (identifier)
           (range_value
@@ -60,31 +63,32 @@ test("for") |t|
               (identifier)))
           (body
             (pass_statement)))
-        (for_statement
+        (ERROR
           (identifier)
+          (identifier)
+          (ERROR
+            (range_value
+              (integer))
+            (range_value
+              (integer))
+            (range_value
+              (integer))
+            (ERROR)
+            (identifier)
+            (identifier)
+            (identifier))
           (range_value
-            (list
-              (integer)
-              (integer)
-              (integer)))
-          (body
-            (pass_statement)))
-        (for_statement
-          (identifier)
-          (identifier)
-          (range_value
-            (map
-              (key_value
-                (key
-                  (symbol
-                    (identifier)))
-                (value
-                  (integer)))
-              (key_value
-                (key
-                  (symbol
-                    (identifier)))
-                (value
-                  (integer)))))
-          (body
-            (pass_statement)))))))
+            (integer))))))
+  (ERROR
+    (identifier)
+    (identifier)
+    (identifier)
+    (string_start)
+    (identifier)
+    (string_start)
+    (integer)
+    (string_start)
+    (string_start)
+    (integer)
+    (identifier)
+    (identifier)))

@@ -40,7 +40,8 @@ fn fetch_all_posts(req: Request): Response =
   (fn
     (decorator
       (call
-        (identifier)
+        (reference
+          (identifier))
         (argument_list
           (string
             (string_start)
