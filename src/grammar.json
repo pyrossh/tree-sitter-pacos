@@ -1,6 +1,5 @@
 {
   "name": "pacos",
-  "word": "identifier",
   "rules": {
     "source": {
       "type": "SEQ",
@@ -124,7 +123,7 @@
           "name": "name",
           "content": {
             "type": "SYMBOL",
-            "name": "identifier"
+            "name": "constname"
           }
         },
         {
@@ -141,7 +140,7 @@
         }
       ]
     },
-    "generic_list": {
+    "generics": {
       "type": "SEQ",
       "members": [
         {
@@ -184,7 +183,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "typename"
+          "name": "genericname"
         },
         {
           "type": "CHOICE",
@@ -254,7 +253,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "generic_list"
+                "name": "generics"
               },
               {
                 "type": "BLANK"
@@ -314,7 +313,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "generic_list"
+                "name": "generics"
               },
               {
                 "type": "BLANK"
@@ -429,7 +428,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "generic_list"
+                "name": "generics"
               },
               {
                 "type": "BLANK"
@@ -737,7 +736,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "generic_list"
+                "name": "generics"
               },
               {
                 "type": "BLANK"
@@ -3305,6 +3304,14 @@
       "type": "PATTERN",
       "value": "[_a-z][_0-9a-z]*"
     },
+    "constname": {
+      "type": "PATTERN",
+      "value": "[_A-Z]+"
+    },
+    "genericname": {
+      "type": "PATTERN",
+      "value": "[A-Z]"
+    },
     "typename": {
       "type": "PATTERN",
       "value": "[_a-zA-Z][_a-zA-Z]*"
@@ -3345,46 +3352,6 @@
         {
           "type": "SYMBOL",
           "name": "identifier"
-        }
-      ]
-    },
-    "keyword_identifier": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "PREC",
-          "value": -3,
-          "content": {
-            "type": "ALIAS",
-            "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "print"
-                },
-                {
-                  "type": "STRING",
-                  "value": "exec"
-                },
-                {
-                  "type": "STRING",
-                  "value": "match"
-                }
-              ]
-            },
-            "named": true,
-            "value": "identifier"
-          }
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "STRING",
-            "value": "type"
-          },
-          "named": true,
-          "value": "identifier"
         }
       ]
     },

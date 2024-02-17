@@ -60,29 +60,29 @@ fn add[T: int | float](a: List[T], b: List[T]): List[T] =
       (pass_statement)))
   (fn
     (identifier)
-    (generic_list
+    (generics
       (generic_type
-        (typename)
+        (genericname)
         (typename)
         (typename)))
     (param
       (identifier)
       (type
         (typename)
-        (generic_list
+        (generics
           (generic_type
-            (typename)))))
+            (genericname)))))
     (param
       (identifier)
       (type
         (typename)
-        (generic_list
+        (generics
           (generic_type
-            (typename)))))
+            (genericname)))))
     (type
       (typename)
-      (generic_list
+      (generics
         (generic_type
-          (typename))))
+          (genericname))))
     (body
       (pass_statement))))

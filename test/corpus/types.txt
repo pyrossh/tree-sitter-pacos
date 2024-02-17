@@ -119,43 +119,38 @@ test("str") |t|
 --------------------------------------------------------------------------------
 
 (source
-  (ERROR
-    (ERROR
-      (string
-        (string_start)
-        (string_end))
+  (test
+    (string
+      (string_start)
+      (string_end))
+    (lambda
       (identifier)
-      (assignment_statement
-        (identifier)
-        (string
-          (string_start)
-          (string_end)))
-      (assignment_statement
-        (identifier)
-        (ERROR
-          (string_start)
+      (body
+        (assignment_statement
           (identifier)
-          (UNEXPECTED '1'))
-        (integer))
-      (ERROR
-        (UNEXPECTED 'u'))
-      (identifier)
-      (string
-        (string_start)
-        (string_end))
-      (string
-        (string_start)
-        (string_end))
-      (UNEXPECTED 'A')
-      (identifier)
-      (identifier)
-      (identifier)
-      (identifier)
-      (identifier)
-      (identifier)
-      (identifier)
-      (identifier))
-    (string_start)))
+          (string
+            (string_start)
+            (string_end)))
+        (assignment_statement
+          (identifier)
+          (ERROR
+            (string_start)
+            (UNEXPECTED 'x')
+            (UNEXPECTED '1')
+            (UNEXPECTED 'u')
+            (string
+              (string_start)
+              (string_end))
+            (string
+              (string_start)
+              (string_end))
+            (ERROR
+              (constname)
+              (UNEXPECTED 'd')
+              (UNEXPECTED 'i')))
+          (string
+            (string_start)
+            (MISSING string_end)))))))
 
 ================================================================================
 List

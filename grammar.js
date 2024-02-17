@@ -71,8 +71,6 @@ module.exports = grammar({
     $._expressions,
   ],
 
-  word: ($) => $.identifier,
-
   rules: {
     source: ($) =>
       seq(
@@ -90,27 +88,26 @@ module.exports = grammar({
     const: ($) =>
       seq(
         "const",
-        field("name", $.identifier),
+        field("name", $.constname),
         "=",
         field("value", $.primary_expression)
       ),
 
-    generic_list: ($) => seq("[", commaSep1($.generic_type), "]"),
+    generics: ($) => seq("[", commaSep1($.generic_type), "]"),
     generic_type: ($) =>
-      seq($.typename, optional(seq(":", sep1($.typename, choice("&", "|"))))),
-    type: ($) =>
       seq(
-        $.typename,
-        field("generics", optional($.generic_list)),
-        optional("?")
+        $.genericname,
+        optional(seq(":", sep1($.typename, choice("&", "|"))))
       ),
+    type: ($) =>
+      seq($.typename, field("generics", optional($.generics)), optional("?")),
 
     record: ($) =>
       seq(
         optional(repeat($.doc_comment)),
         "record",
         field("name", $.typename),
-        field("generics", optional($.generic_list)),
+        field("generics", optional($.generics)),
         field("fields", seq("(", commaSep1($.record_field), ")"))
       ),
 
@@ -122,7 +119,7 @@ module.exports = grammar({
         optional(repeat($.doc_comment)),
         "trait",
         field("name", $.typename),
-        field("generics", optional($.generic_list)),
+        field("generics", optional($.generics)),
         field("fields", seq("(", repeat($.trait_field), ")"))
       ),
 
@@ -155,7 +152,7 @@ module.exports = grammar({
         optional($.decorator),
         "fn",
         field("name", choice($.identifier, $._extension)),
-        field("generics", optional($.generic_list)),
+        field("generics", optional($.generics)),
         field("params", seq("(", optional(commaSep1($.param)), ")")),
         ":",
         field("returns", optional(commaSep1($.type))),
@@ -612,17 +609,12 @@ module.exports = grammar({
     _binary: ($) => /0b[0-1_]+/,
 
     identifier: (_) => /[_a-z][_0-9a-z]*/,
+    constname: (_) => /[_A-Z]+/,
+    genericname: (_) => /[A-Z]/,
     typename: (_) => /[_a-zA-Z][_a-zA-Z]*/,
 
     _interpolation: ($) => choice(seq("{", $.identifier, "}")),
-
     _extension: ($) => seq($.identifier, ".", $.identifier),
-
-    keyword_identifier: ($) =>
-      choice(
-        prec(-3, alias(choice("print", "exec", "match"), $.identifier)),
-        alias("type", $.identifier)
-      ),
 
     true: (_) => "true",
     false: (_) => "false",

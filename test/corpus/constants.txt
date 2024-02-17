@@ -17,60 +17,68 @@ const COUNTRY_CODES = map.of(
 --------------------------------------------------------------------------------
 
 (source
-  (ERROR
-    (UNEXPECTED 'S')
-    (UNEXPECTED 'Y')
-    (UNEXPECTED 'P')
-    (float)
-    (ERROR
-      (UNEXPECTED 'N')
-      (string_start))
-    (identifier)
-    (string_start)
-    (UNEXPECTED 'D')
-    (UNEXPECTED 'E')
-    (true)
-    (ERROR
-      (UNEXPECTED 'C'))
-    (identifier)
-    (ERROR
-      (UNEXPECTED 'C')
-      (UNEXPECTED 'L')
-      (identifier))
-    (identifier)
-    (string_start)
-    (UNEXPECTED 'U')
-    (string_start)
-    (string_start)
-    (UNEXPECTED 'I')
-    (string_start)
-    (string_start)
-    (UNEXPECTED 'C')
-    (string_start)
-    (ERROR
-      (UNEXPECTED 'C')
-      (UNEXPECTED 'C')
-      (identifier)
-      (identifier)
+  (const
+    (constname)
+    (integer))
+  (const
+    (constname)
+    (float))
+  (const
+    (constname)
+    (string
       (string_start)
-      (identifier)
-      (string_start)
-      (string_start)
-      (UNEXPECTED 'I')
-      (string_start)
-      (string_start)
-      (identifier)
-      (string_start)
-      (string_start)
-      (UNEXPECTED 'U')
-      (identifier)
-      (UNEXPECTED 'S')
-      (identifier)
-      (string_start)
-      (string_start)
-      (identifier)
-      (string_start)
-      (string_start)
-      (UNEXPECTED 'C'))
-    (identifier)
-    (string_start)))
+      (string_end)))
+  (const
+    (constname)
+    (true))
+  (const
+    (constname)
+    (call
+      (reference
+        (identifier))
+      (argument_list
+        (integer))))
+  (const
+    (constname)
+    (call
+      (reference
+        (identifier)
+        (identifier))
+      (argument_list
+        (string
+          (string_start)
+          (string_end))
+        (string
+          (string_start)
+          (string_end))
+        (string
+          (string_start)
+          (string_end)))))
+  (const
+    (constname)
+    (call
+      (reference
+        (identifier)
+        (identifier))
+      (argument_list
+        (pair_argument
+          (string
+            (string_start)
+            (string_end))
+          (string
+            (string_start)
+            (string_end)))
+        (pair_argument
+          (string
+            (string_start)
+            (string_end))
+          (string
+            (string_start)
+            (string_end)))
+        (pair_argument
+          (string
+            (string_start)
+            (string_end))
+          (string
+            (string_start)
+            (string_end)))))))

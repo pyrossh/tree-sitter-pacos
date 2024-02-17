@@ -44,11 +44,11 @@ record Dog[A: Compare & String, B](
         (typename))))
   (record
     (typename)
-    (generic_list
+    (generics
       (generic_type
-        (typename))
+        (genericname))
       (generic_type
-        (typename)))
+        (genericname)))
     (record_field
       (identifier)
       (type
@@ -59,13 +59,13 @@ record Dog[A: Compare & String, B](
         (typename))))
   (record
     (typename)
-    (generic_list
+    (generics
       (generic_type
-        (typename)
+        (genericname)
         (typename)
         (typename))
       (generic_type
-        (typename)))
+        (genericname)))
     (record_field
       (identifier)
       (type

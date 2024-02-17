@@ -15,9 +15,9 @@ trait Stringable(
 (source
   (trait
     (typename)
-    (generic_list
+    (generics
       (generic_type
-        (typename)))
+        (genericname)))
     (trait_field
       (identifier)
       (param

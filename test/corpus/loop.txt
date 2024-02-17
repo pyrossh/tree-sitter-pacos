@@ -30,7 +30,7 @@ test("for") |t|
       (string_end))
     (lambda
       (identifier)
-      (body
+      (ERROR
         (for_statement
           (identifier)
           (integer)
@@ -47,45 +47,26 @@ test("for") |t|
           (identifier)
           (body
             (pass_statement)))
-        (for_statement
+        (identifier)
+        (reference
           (identifier)
-          (ERROR
-            (reference
-              (identifier)
-              (identifier))
-            (identifier)
-            (identifier))
-          (identifier)
-          (call
-            (reference
-              (identifier)
-              (identifier))
-            (argument_list
-              (integer)
-              (integer)
-              (integer)))
-          (body
-            (pass_statement)))
-        (for_statement
-          (identifier)
-          (identifier)
-          (call
-            (reference
-              (identifier)
-              (identifier))
-            (argument_list
-              (pair_argument
-                (string
-                  (string_start)
-                  (string_end))
-                (integer))
-              (pair_argument
-                (string
-                  (string_start)
-                  (string_end))
-                (integer))))
-          (body
-            (pass_statement)))))))
+          (identifier)))
+      (body
+        (pass_statement))))
+  (ERROR
+    (UNEXPECTED ',')
+    (UNEXPECTED 'v')
+    (UNEXPECTED 'l')
+    (UNEXPECTED 'o')
+    (UNEXPECTED 'k')
+    (UNEXPECTED 'v')
+    (UNEXPECTED 'p')
+    (UNEXPECTED 'o')
+    (string_start)
+    (UNEXPECTED '"')
+    (string_start)
+    (string_start)
+    (string_start)))
 
 ================================================================================
 while
