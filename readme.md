@@ -6,4 +6,4 @@
 
 👾 Pacos Programming Language
 
-Tree sitter grammar for [pacos programming language](https://github.com/pyrossh/pacos)
+Tree sitter grammar for [pacos programming language](https://github.com/pyrossh/pacos.sh)

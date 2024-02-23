@@ -1,6 +1,5 @@
 const PREC = {
   conditional: -1,
-
   parenthesized_expression: 1,
   or: 10,
   and: 11,
@@ -28,7 +27,6 @@ module.exports = grammar({
 
   conflicts: ($) => [
     [$.primary_expression, $.pattern],
-    [$.named_expression, $.as_pattern],
     [$.type_alias_statement, $.primary_expression],
   ],
 
@@ -99,8 +97,7 @@ module.exports = grammar({
         $.genericname,
         optional(seq(":", sep1($.typename, choice("&", "|"))))
       ),
-    type: ($) =>
-      seq($.typename, field("generics", optional($.generics)), optional("?")),
+    type: ($) => seq($.typename, field("generics", optional($.generics))),
 
     record: ($) =>
       seq(
@@ -129,11 +126,24 @@ module.exports = grammar({
         field("name", $.identifier),
         field("params", seq("(", optional(commaSep1($.param)), ")")),
         ":",
-        field("returns", optional(commaSep1($.type)))
+        field("returns", optional($.return_type))
       ),
 
-    param: ($) => seq(field("name", $.identifier), ":", field("type", $.type)),
-    // optional(seq("=",field("value", $.expression)))
+    param: ($) =>
+      seq(
+        field("name", $.identifier),
+        ":",
+        field("type", $.type),
+        optional(seq("=", field("value", $.expression)))
+      ),
+
+    return_type: ($) =>
+      seq(
+        $.typename,
+        field("generics", optional($.generics)),
+        field("nilable", optional($.nilable)),
+        field("throwable", optional($.throwable))
+      ),
 
     enum: ($) =>
       seq(
@@ -151,11 +161,11 @@ module.exports = grammar({
       seq(
         optional($.decorator),
         "fn",
-        field("name", choice($.identifier, $._extension)),
+        field("name", choice($.fnname, $._extension)),
         field("generics", optional($.generics)),
         field("params", seq("(", optional(commaSep1($.param)), ")")),
         ":",
-        field("returns", optional(commaSep1($.type))),
+        field("returns", optional($.return_type)),
         "=",
         $.body
       ),
@@ -174,8 +184,8 @@ module.exports = grammar({
         $.pass_statement,
         $.assignment_statement,
         $.break_statement,
-        $.continue_statement
-        // $.assert_statement,
+        $.continue_statement,
+        $.assert_statement
         // $.expression_statement,
         // $.return_statement,
         // $.raise_statement,
@@ -201,7 +211,7 @@ module.exports = grammar({
               "|="
             )
           ),
-          field("right", $.primary_expression)
+          field("right", commaSep1($.primary_expression))
         )
       ),
 
@@ -209,15 +219,6 @@ module.exports = grammar({
 
     expression_statement: ($) =>
       choice($.expression, seq(commaSep1($.expression), optional(","))),
-
-    named_expression: ($) =>
-      seq(
-        field("name", $._named_expression_lhs),
-        "=",
-        field("value", $.expression)
-      ),
-
-    _named_expression_lhs: ($) => $.identifier,
 
     return_statement: ($) => seq("return", optional($._expressions)),
 
@@ -238,8 +239,8 @@ module.exports = grammar({
     _compound_statement: ($) =>
       choice(
         $.for_statement,
-        $.while_statement
-        // $.if_statement,
+        $.while_statement,
+        $.if_statement
         // $.match_statement
       ),
 
@@ -319,15 +320,7 @@ module.exports = grammar({
 
     // Match cases
 
-    case_pattern: ($) =>
-      prec(
-        1,
-        choice(
-          alias($._as_pattern, $.as_pattern),
-          $.keyword_pattern,
-          $._simple_pattern
-        )
-      ),
+    case_pattern: ($) => prec(1, choice($._simple_pattern)),
 
     _simple_pattern: ($) =>
       prec(
@@ -344,13 +337,6 @@ module.exports = grammar({
           "_"
         )
       ),
-
-    _as_pattern: ($) => seq($.case_pattern, "as", $.identifier),
-
-    _key_value_pattern: ($) =>
-      seq(field("key", $._simple_pattern), ":", field("value", $.case_pattern)),
-
-    keyword_pattern: ($) => seq($.identifier, "=", $._simple_pattern),
 
     class_pattern: ($) =>
       seq(
@@ -376,17 +362,6 @@ module.exports = grammar({
 
     // Extended patterns (patterns allowed in match statement are far more flexible than simple patterns though still a subset of "expression")
 
-    as_pattern: ($) =>
-      prec.left(
-        seq(
-          $.expression,
-          "as",
-          field("alias", alias($.expression, $.as_pattern_target))
-        )
-      ),
-
-    // Expressions
-
     expression: ($) =>
       choice(
         $.comparison_operator,
@@ -394,9 +369,7 @@ module.exports = grammar({
         $.boolean_operator,
         $.lambda,
         $.primary_expression,
-        $.ternary_expression,
-        $.named_expression,
-        $.as_pattern
+        $.ternary_expression
       ),
 
     primary_expression: ($) =>
@@ -411,9 +384,12 @@ module.exports = grammar({
         $.nil,
         $.unary_operator,
         $.attribute,
-        $.call
-        // $.parenthesized_expression
+        $.call,
+        $.parenthesized_expression
       ),
+
+    parenthesized_expression: ($) =>
+      prec(PREC.parenthesized_expression, seq("(", $.expression, ")")),
 
     not_operator: ($) =>
       prec(PREC.not, seq("!", field("argument", $.expression))),
@@ -608,17 +584,21 @@ module.exports = grammar({
     _decimal: ($) => /[0-9][0-9_]*(i)?/,
     _binary: ($) => /0b[0-1_]+/,
 
-    identifier: (_) => /[_a-z][_0-9a-z]*/,
-    constname: (_) => /[_A-Z]+/,
-    genericname: (_) => /[A-Z]/,
-    typename: (_) => /[_a-zA-Z][_a-zA-Z]*/,
+    identifier: (_) => /[_a-z][_0-9a-z]*/, // snake_case
+    fnname: (_) =>
+      /[a-z][a-z]*(([A-Z][a-z]+)*[A-Z]?|([a-z]+[A-Z])*|[A-Z])/, // lowerCamelCase no digits
+    constname: (_) => /[_A-Z0-9]+/, // screaming camel case
+    genericname: (_) => /[A-Z]/, // single letter
+    typename: (_) => /[_a-zA-Z][_a-zA-Z]*/, // upperCamelCase no digits
 
     _interpolation: ($) => choice(seq("{", $.identifier, "}")),
-    _extension: ($) => seq($.identifier, ".", $.identifier),
+    _extension: ($) => seq($.typename, ".", $.fnname),
 
     true: (_) => "true",
     false: (_) => "false",
     nil: (_) => "nil",
+    nilable: () => "?",
+    throwable: () => "!",
 
     comment: (_) => token(seq("//", /.*/)),
     doc_comment: (_) => token(seq("`", /.*/)),
@@ -630,55 +610,10 @@ module.exports = grammar({
 
 module.exports.PREC = PREC;
 
-/**
- * Creates a rule to match one or more of the rules separated by a comma
- *
- * @param {RuleOrLiteral} rule
- *
- * @return {SeqRule}
- *
- */
 function commaSep1(rule) {
   return sep1(rule, ",");
 }
 
-/**
- * Creates a rule to match one or more occurrences of `rule` separated by `sep`
- *
- * @param {RuleOrLiteral} rule
- *
- * @param {RuleOrLiteral} separator
- *
- * @return {SeqRule}
- *
- */
 function sep1(rule, separator) {
   return seq(rule, repeat(seq(separator, rule)));
-}
-
-function arithmeticExpression(exprType) {
-  return choice(
-    binaryExpr(prec.left, 1, "||", exprType),
-    binaryExpr(prec.left, 2, "&&", exprType),
-    binaryExpr(prec.left, 3, "==", exprType),
-    binaryExpr(prec.left, 3, "!=", exprType),
-    binaryExpr(prec.left, 4, "<", exprType),
-    binaryExpr(prec.left, 4, "<=", exprType),
-    binaryExpr(prec.left, 4, ">", exprType),
-    binaryExpr(prec.left, 4, ">=", exprType),
-    binaryExpr(prec.left, 5, "|>", exprType),
-    binaryExpr(prec.left, 6, "+", exprType),
-    binaryExpr(prec.left, 6, "-", exprType),
-    binaryExpr(prec.left, 7, "*", exprType),
-    binaryExpr(prec.left, 7, "/", exprType),
-    binaryExpr(prec.left, 7, "%", exprType),
-    binaryExpr(prec.left, 7, "<>", exprType)
-  );
-}
-
-function binaryExpr(assoc, precedence, operator, expr) {
-  return assoc(
-    precedence,
-    seq(field("left", expr), field("operator", operator), field("right", expr))
-  );
 }

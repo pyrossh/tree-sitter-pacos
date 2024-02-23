@@ -28,11 +28,11 @@ trait Stringable(
         (identifier)
         (type
           (typename)))
-      (type
+      (return_type
         (typename))))
   (trait
     (typename)
     (trait_field
       (identifier)
-      (type
+      (return_type
         (typename)))))

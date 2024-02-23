@@ -2,15 +2,21 @@
 Function
 ================================================================================
 
-fn to_celsius(f: float): float =
+fn sum(a: int, b: int): int =
+  pass
+
+fn random(a: int = 10): int =
+  pass
+
+fn toCelsius(f: float): float =
   `converts f in fahrenheit to celsius to a value
   pass
 
-fn create_post_action(req: Request): Response =
+fn createPostAction(req: Request): Response! =
   pass
 
 #[get("/posts")]
-fn fetch_all_posts(req: Request): Response =
+fn fetchAllPosts(req: Request): Response? =
   pass
 
 fn add[T: int | float](a: List[T], b: List[T]): List[T] =
@@ -20,24 +26,50 @@ fn add[T: int | float](a: List[T], b: List[T]): List[T] =
 
 (source
   (fn
-    (identifier)
+    (fnname)
     (param
       (identifier)
       (type
         (typename)))
-    (type
+    (param
+      (identifier)
+      (type
+        (typename)))
+    (return_type
+      (typename))
+    (body
+      (pass_statement)))
+  (fn
+    (fnname)
+    (param
+      (identifier)
+      (type
+        (typename))
+      (integer))
+    (return_type
+      (typename))
+    (body
+      (pass_statement)))
+  (fn
+    (fnname)
+    (param
+      (identifier)
+      (type
+        (typename)))
+    (return_type
       (typename))
     (body
       (doc_comment)
       (pass_statement)))
   (fn
-    (identifier)
+    (fnname)
     (param
       (identifier)
       (type
         (typename)))
-    (type
-      (typename))
+    (return_type
+      (typename)
+      (throwable))
     (body
       (pass_statement)))
   (fn
@@ -49,17 +81,18 @@ fn add[T: int | float](a: List[T], b: List[T]): List[T] =
           (string
             (string_start)
             (string_end)))))
-    (identifier)
+    (fnname)
     (param
       (identifier)
       (type
         (typename)))
-    (type
-      (typename))
+    (return_type
+      (typename)
+      (nilable))
     (body
       (pass_statement)))
   (fn
-    (identifier)
+    (fnname)
     (generics
       (generic_type
         (genericname)
@@ -79,7 +112,7 @@ fn add[T: int | float](a: List[T], b: List[T]): List[T] =
         (generics
           (generic_type
             (genericname)))))
-    (type
+    (return_type
       (typename)
       (generics
         (generic_type

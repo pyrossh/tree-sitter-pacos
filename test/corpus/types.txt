@@ -3,9 +3,9 @@ primitive
 ================================================================================
 
 test("primitive") |t|
-  a := true
-  b := false
-  c := nil
+  let a = true
+  let b = false
+  let c = nil
 
 --------------------------------------------------------------------------------
 
@@ -17,14 +17,13 @@ test("primitive") |t|
     (lambda
       (identifier)
       (body
-        (assignment_statement
+        (ERROR
           (identifier)
-          (true))
-        (assignment_statement
-          (identifier)
-          (false))
-        (assignment_statement
-          (identifier)
+          (typename)
+          (true)
+          (UNEXPECTED 'l')
+          (false)
+          (UNEXPECTED 'l')
           (nil))))))
 
 ================================================================================
@@ -32,12 +31,7 @@ int
 ================================================================================
 
 test("int") |t|
-  a := +123
-  b := -111
-  c := 456
-  d := 0xcafe
-  e := 0b001
-  f := 25i
+  a, b, c, d, e, f := +123, -111, 456, 0xcafe, 0b001, 25i
 
 --------------------------------------------------------------------------------
 
@@ -51,23 +45,18 @@ test("int") |t|
       (body
         (assignment_statement
           (identifier)
-          (unary_operator
-            (integer)))
-        (assignment_statement
+          (identifier)
+          (identifier)
+          (identifier)
+          (identifier)
           (identifier)
           (unary_operator
-            (integer)))
-        (assignment_statement
-          (identifier)
-          (integer))
-        (assignment_statement
-          (identifier)
-          (integer))
-        (assignment_statement
-          (identifier)
-          (integer))
-        (assignment_statement
-          (identifier)
+            (integer))
+          (unary_operator
+            (integer))
+          (integer)
+          (integer)
+          (integer)
           (integer))))))
 
 ================================================================================
@@ -109,12 +98,12 @@ str
 ================================================================================
 
 test("str") |t|
-  a := "123"
-  b := "\x12 \123 \u1234"
-  c := """
-  A double quote hello,
-  without double or single quotes.
-  """
+  a := str.of("123")
+  b := str("\x12 \123 \u1234")
+  c := str(`
+    A double quote hello,
+    without double or single quotes.
+  `)
 
 --------------------------------------------------------------------------------
 
@@ -125,32 +114,42 @@ test("str") |t|
       (string_end))
     (lambda
       (identifier)
+      (ERROR
+        (assignment_statement
+          (identifier)
+          (call
+            (reference
+              (identifier)
+              (identifier))
+            (argument_list
+              (string
+                (string_start)
+                (string_end)))))
+        (assignment_statement
+          (identifier)
+          (call
+            (reference
+              (identifier))
+            (argument_list
+              (ERROR
+                (string_start)
+                (UNEXPECTED 'x')
+                (UNEXPECTED '1')
+                (UNEXPECTED 'u')
+                (string_start)))))
+        (identifier)
+        (reference
+          (identifier))
+        (string_start)
+        (genericname)
+        (UNEXPECTED 'd'))
       (body
-        (assignment_statement
+        (ERROR
           (identifier)
-          (string
-            (string_start)
-            (string_end)))
-        (assignment_statement
-          (identifier)
-          (ERROR
-            (string_start)
-            (UNEXPECTED 'x')
-            (UNEXPECTED '1')
-            (UNEXPECTED 'u')
-            (string
-              (string_start)
-              (string_end))
-            (string
-              (string_start)
-              (string_end))
-            (ERROR
-              (constname)
-              (UNEXPECTED 'd')
-              (UNEXPECTED 'i')))
-          (string
-            (string_start)
-            (MISSING string_end)))))))
+          (typename)
+          (UNEXPECTED 'o')))))
+  (ERROR
+    (doc_comment)))
 
 ================================================================================
 List
